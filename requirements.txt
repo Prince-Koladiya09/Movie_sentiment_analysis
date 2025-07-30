@@ -1,0 +1,17 @@
+# Core ML & Data Handling
+tensorflow
+tensorflow-datasets
+scikit-learn
+pandas
+numpy
+
+# Visualization & Text Processing
+matplotlib
+seaborn
+wordcloud
+nltk
+
+# Advanced Models & Interpretability
+transformers
+lime
+notebook
