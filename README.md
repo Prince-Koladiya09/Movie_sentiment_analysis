@@ -14,11 +14,7 @@ An end-to-end NLP project that classifies IMDB movie reviews as positive or nega
 
 ## 🌟 About The Project
 
-This repository contains the complete pipeline for a robust sentiment analysis system. Starting with the classic IMDB dataset, this project explores various natural language processing techniques to build and evaluate models of increasing complexity. The goal is not just to classify reviews but to understand the evolution of NLP methods and the trade-offs between model performance, complexity, and interpretability.
 
-<p align="center">
-  <img src="https://i.imgur.com/gK9q05P.png" alt="Model Performance Comparison" width="700"/>
-</p>
 
 ---
 
