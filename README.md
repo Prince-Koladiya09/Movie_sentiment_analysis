@@ -5,7 +5,6 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg?style=for-the-badge&logo=python)](https://www.python.org/)
 [![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange.svg?style=for-the-badge&logo=tensorflow)](https://www.tensorflow.org/)
 [![Transformers](https://img.shields.io/badge/🤗%20Transformers-4.x-yellow.svg?style=for-the-badge&logo=hugging-face)](https://huggingface.co/docs/transformers/index)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
 </div>
 
@@ -62,6 +61,20 @@ Building an effective NLP model comes with its own set of challenges. Here’s h
 
 ---
 
+## ⚙️ Project Complexities
+
+Beyond the initial challenges, this project navigated several layers of complexity inherent in modern NLP workflows:
+
+* **Hyperparameter Tuning:** Finding the optimal settings for models isn't trivial. This project used `GridSearchCV` for classic models and required careful manual tuning of the learning rate, dropout values, number of LSTM units, and batch sizes for the deep learning models to achieve peak performance without overfitting.
+
+* **Computational Resource Management:** Training deep learning models is resource-intensive. The Bidirectional LSTM and especially the DistilBERT model required significant training time. A key complexity was balancing model performance with practical training times, showcasing why a distilled model like `DistilBERT` is often a great choice over larger models like `BERT-large`.
+
+* **Vocabulary and Embedding Management:** The full IMDB vocabulary is vast. A complexity was managing this by capping the vocabulary size to the most frequent words and using an Out-of-Vocabulary (`<OOV>`) token. This keeps the model's embedding layer computationally feasible while handling rare words gracefully.
+
+* **Handling Linguistic Nuance:** Sentiment is often conveyed through subtle means like sarcasm, irony, or conditional statements. While advanced models like DistilBERT can capture some of this nuance through its attention mechanism, it remains a significant challenge and a primary source of misclassifications, requiring qualitative error analysis to understand the model's limitations.
+
+---
+
 ## 🚀 Getting Started
 
 To get a local copy up and running, follow these simple steps.
@@ -102,11 +115,3 @@ You can explore the project by running the Jupyter Notebook or the Python script
     ```sh
     python sentiment_analysis.py
     ```
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
-
----
