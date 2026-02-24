@@ -1,0 +1,27 @@
+# IDEs and Editors
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies and Builds
+node_modules/
+dist/
+venv/
+__pycache__/
+*.pyc
+
+# Env
+.env
+.env.local
+.env.*.local
+
+# Project specific
+backend/venv/
+backend/__pycache__/
+frontend/node_modules/
+frontend/dist/
