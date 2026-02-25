@@ -33,7 +33,7 @@ loader = ModelLoader()
 @app.on_event("startup")
 async def startup_event():
     loader.load_all()
-    print("✅ All models loaded and ready")
+    print(" All models loaded and ready")
 
 
 @app.get("/")
