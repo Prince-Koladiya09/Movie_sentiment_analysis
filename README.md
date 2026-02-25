@@ -128,9 +128,6 @@ Start the API:
 uvicorn main:app --reload --port 8000
 ```
 
-Backend starts at → **http://localhost:8000**
-Swagger docs at → **http://localhost:8000/docs**
-
 > **Note:** Without saved model files in `backend/models/saved/`, the backend runs in **demo mode** using keyword heuristics. This still lets you test the full UI with realistic-looking results.
 
 ---
@@ -144,8 +141,6 @@ cd frontend
 npm install
 npm run dev
 ```
-
-Frontend starts at → **http://localhost:5173**
 
 ---
 
