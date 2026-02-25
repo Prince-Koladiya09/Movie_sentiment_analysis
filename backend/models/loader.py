@@ -32,18 +32,18 @@ class ModelLoader:
         if nb_path.exists():
             with open(nb_path, "rb") as f:
                 self.models["naive_bayes"] = {"type": "sklearn", "pipeline": pickle.load(f)}
-            print("✅ Naive Bayes loaded from file")
+            print(" Naive Bayes loaded from file")
         else:
             self.models["naive_bayes"] = {"type": "demo", "label": "naive_bayes"}
-            print("⚠️  Naive Bayes: using demo stub (no saved model found)")
+            print("  Naive Bayes: using demo stub (no saved model found)")
 
         if lr_path.exists():
             with open(lr_path, "rb") as f:
                 self.models["logistic_regression"] = {"type": "sklearn", "pipeline": pickle.load(f)}
-            print("✅ Logistic Regression loaded from file")
+            print(" Logistic Regression loaded from file")
         else:
             self.models["logistic_regression"] = {"type": "demo", "label": "logistic_regression"}
-            print("⚠️  Logistic Regression: using demo stub")
+            print("  Logistic Regression: using demo stub")
 
     # ── LSTM ──────────────────────────────────────────────────────────────────
 
@@ -58,13 +58,13 @@ class ModelLoader:
                 with open(tok_path, "rb") as f:
                     self.tokenizer = pickle.load(f)
                 self.models["rnn_lstm"] = {"type": "lstm", "model": lstm_model}
-                print("✅ RNN (LSTM) loaded from file")
+                print(" RNN (LSTM) loaded from file")
             except Exception as e:
-                print(f"⚠️  LSTM load failed ({e}); using demo stub")
+                print(f"  LSTM load failed ({e}); using demo stub")
                 self.models["rnn_lstm"] = {"type": "demo", "label": "rnn_lstm"}
         else:
             self.models["rnn_lstm"] = {"type": "demo", "label": "rnn_lstm"}
-            print("⚠️  RNN (LSTM): using demo stub (no saved model found)")
+            print("  RNN (LSTM): using demo stub (no saved model found)")
 
     # ── DistilBERT ────────────────────────────────────────────────────────────
 
@@ -77,9 +77,9 @@ class ModelLoader:
                 self.bert_tokenizer = DistilBertTokenizer.from_pretrained(str(bert_path))
                 bert_model = TFDistilBertForSequenceClassification.from_pretrained(str(bert_path))
                 self.models["distilbert"] = {"type": "bert", "model": bert_model}
-                print("✅ DistilBERT loaded from file")
+                print(" DistilBERT loaded from file")
             except Exception as e:
-                print(f"⚠️  DistilBERT load failed ({e}); using demo stub")
+                print(f"  DistilBERT load failed ({e}); using demo stub")
                 self.models["distilbert"] = {"type": "demo", "label": "distilbert"}
         else:
             self.models["distilbert"] = {"type": "demo", "label": "distilbert"}
