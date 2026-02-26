@@ -4,6 +4,8 @@
 
 A full-stack ML dashboard for IMDB movie sentiment analysis, featuring 4 models (Naive Bayes, Logistic Regression, Bidirectional LSTM, DistilBERT), rich data visualizations, LIME explanations, error analysis, and feature importance — all powered by a FastAPI backend and a beautiful React frontend.
 
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-8B5CF6?style=for-the-badge&logo=vercel&logoColor=white)](https://sentiment-dashboard-delta.vercel.app/)
+
 **All metrics, charts, and data are generated from real model training — no mock or hardcoded data.**
 
 ---
