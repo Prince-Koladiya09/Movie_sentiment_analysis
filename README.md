@@ -1,107 +1,60 @@
 # 🎬 SentimentAI — Movie Review Analysis Dashboard
 
-> **End-to-end NLP pipeline exploring sentiment classification from Bag-of-Words to BERT** ✨
+> End-to-end NLP pipeline exploring sentiment classification from Bag-of-Words to BERT ✨
 
-A full-stack ML dashboard for IMDB movie sentiment analysis, featuring 4 models (Naive Bayes, Logistic Regression, Bidirectional LSTM, DistilBERT), live predictions with LIME explanations, and rich data visualizations — all powered by a FastAPI backend and a beautiful React frontend.
+A full-stack ML dashboard for IMDB movie sentiment analysis, featuring 4 models (Naive Bayes, Logistic Regression, Bidirectional LSTM, DistilBERT), rich data visualizations, LIME explanations, error analysis, and feature importance — all powered by a FastAPI backend and a beautiful React frontend.
+
+**All metrics, charts, and data are generated from real model training — no mock or hardcoded data.**
 
 ---
 
 ## ✨ Features
 
 | Feature | Description |
-|---|---|
-| 🧠 **4 ML Models** | Naive Bayes, Logistic Regression, Bidirectional LSTM, DistilBERT |
-| ⚡ **Live Predictor** | Real-time sentiment analysis with confidence gauge |
-| 🔍 **LIME Explanations** | Word-level importance highlighting for every prediction |
-| 📊 **Model Comparison** | Metrics table, ROC curves, radar chart, confusion matrices |
-| 📈 **Data Explorer** | Length histograms, sentiment donut, word frequency charts |
-| 🐛 **Error Analysis** | Filterable misclassification table with sarcasm examples |
-| 🎓 **Demo Mode** | Keyword heuristics — works without any trained models |
-| 🌙 **Beautiful UI** | Warm design system with Framer Motion animations |
+|---------|-------------|
+| 🧠 4 ML Models | Naive Bayes, Logistic Regression, Bidirectional LSTM, DistilBERT |
+| 📊 Model Comparison | Metrics table, ROC curves, PR curves, radar chart, confusion matrices, training history |
+| 📈 Data Explorer | Length histograms, sentiment donut, word frequency charts, sample review table |
+| 🐛 Error Analysis | Filterable misclassification table, confidence distribution, high-confidence failures |
+| 🔍 LIME Explanations | Pre-computed word-level importance for diverse test samples |
+| ⭐ Feature Importance | Top positive/negative words from LR coefficients and NB log-probabilities |
+| 🤝 Model Agreement | Heatmap showing how often model pairs agree, universally hard cases |
+| 🌙 Beautiful UI | Warm design system with Framer Motion animations |
 
 ---
 
 ## 🗺️ Architecture Overview
 
-```mermaid
-flowchart TD
-    A([👤 User — Browser\nhttp://localhost:5173]) --> B[⚛️ React Frontend\nVite + Tailwind + Recharts]
-
-    B --> C{API Request}
-    C --> D[🚀 FastAPI Backend\nlocalhost:8000]
-
-    D --> E[📦 Model Loader\nStartup: loads all 4 models]
-
-    E --> F1[🟣 Naive Bayes\nnb_pipeline.pkl]
-    E --> F2[🔵 Logistic Regression\nlr_pipeline.pkl]
-    E --> F3[🟢 Bidirectional LSTM\nrnn_lstm.h5]
-    E --> F4[🟡 DistilBERT\ndistilbert/ dir]
-
-    F1 & F2 & F3 & F4 --> G[🔢 Preprocessor\nHTML strip → Lemmatize → Tokens]
-
-    G --> H{Model Type}
-    H -- sklearn --> I[TF-IDF Vectorize\n→ predict_proba]
-    H -- lstm --> J[Keras Tokenizer\n→ pad_sequences → predict]
-    H -- bert --> K[HuggingFace Tokenizer\n→ softmax logits]
-
-    I & J & K --> L[🔍 LIME Explainer\nWord importance weights]
-    L --> M([📤 PredictResponse\nsentiment + confidence\n+ lime_words + ms])
-
-    M --> B
-
-    style A fill:#a78bfa,color:#fff,stroke:#7c3aed
-    style B fill:#5b8fb9,color:#fff,stroke:#3a6d96
-    style D fill:#81b29a,color:#fff,stroke:#4a8c6f
-    style E fill:#c4b5fd,color:#3d3557,stroke:#7c3aed
-    style M fill:#4ade80,color:#fff,stroke:#16a34a
-    style G fill:#fde68a,color:#7c5200,stroke:#d97706
-    style L fill:#fca5a5,color:#7f1d1d,stroke:#ef4444
+```
+train_and_export.py
+      │
+      ▼
+Trains 4 models on IMDB 50K reviews
+      │
+      ▼
+Computes all metrics, curves, errors, explanations
+      │
+      ▼
+Writes 11 JSON files → backend/data/exports/
+      │
+      ▼
+FastAPI reads those files on each request (no ML at runtime)
+      │
+      ▼
+React fetches on page load → Recharts renders everything
 ```
 
----
-
-## 🔁 ML Pipeline Flow
-
-```mermaid
-flowchart LR
-    A([📝 Raw Review\nIMDB Text]) --> B[🧹 Preprocess\nHTML → lowercase\nstopwords → lemmatize]
-    B --> C{Embedding Strategy}
-    C --> D1[📊 TF-IDF\nfor NB and LR]
-    C --> D2[🔢 Sequences\nfor LSTM]
-    C --> D3[🤗 BERT Tokens\nfor DistilBERT]
-    D1 --> E[🎯 Predict]
-    D2 --> E
-    D3 --> E
-    E --> F[🔍 LIME\nExplanation]
-    F --> G([✅ Result\nsentiment + confidence\n+ word weights])
-
-    style A fill:#a78bfa,color:#fff,stroke:#7c3aed
-    style G fill:#4ade80,color:#fff,stroke:#16a34a
-    style F fill:#fca5a5,color:#7f1d1d,stroke:#ef4444
-    style B fill:#fde68a,color:#7c5200,stroke:#d97706
-```
+The backend is **static** — it serves pre-computed JSON files only. No model inference happens at request time. Train once, serve forever.
 
 ---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
+- Python 3.10+
+- Node.js v18+
 
-- **Python** 3.9+
-- **Node.js** v18+
-
----
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/your-username/sentiment-dashboard.git
-cd sentiment-dashboard
-```
-
----
-
-### 2. Backend Setup
+### Step 1 — Backend Setup
 
 ```bash
 cd backend
@@ -116,66 +69,41 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Download required NLTK data:
+### Step 2 — Train models & export data
 
 ```bash
-python -c "import nltk; nltk.download('stopwords'); nltk.download('wordnet'); nltk.download('omw-1.4')"
+# From the project root (not inside backend/)
+python train_and_export.py
 ```
 
-Start the API:
+This trains all available models and writes 11 JSON files to `backend/data/exports/`. The dashboard shows a "run training first" prompt on every page until this step is complete.
+
+**Training time estimates:**
+
+| Model | Time | Requires |
+|-------|------|----------|
+| Naive Bayes | ~30 sec | scikit-learn (default) |
+| Logistic Regression | ~2 min | scikit-learn (default) |
+| Bidirectional LSTM | ~15 min | `pip install tensorflow` |
+| DistilBERT | ~30 min | `pip install transformers tensorflow` |
+
+> ⚠️ TensorFlow and Transformers are **optional**. If not installed, those models are simply skipped and won't appear in the dashboard. NB and LR always run.
+
+### Step 3 — Start the backend
 
 ```bash
+cd backend
 uvicorn main:app --reload --port 8000
 ```
 
-> **Note:** Without saved model files in `backend/models/saved/`, the backend runs in **demo mode** using keyword heuristics. This still lets you test the full UI with realistic-looking results.
-
----
-
-### 3. Frontend Setup
-
-Open a new terminal:
+### Step 4 — Start the frontend
 
 ```bash
 cd frontend
 npm install
 npm run dev
+# Opens at http://localhost:5173
 ```
-
----
-
-## 🔗 Connecting Real Trained Models
-
-After running your `sentiment_analysis.py` training script, save your models using the helper:
-
-```python
-# Add to the end of sentiment_analysis.py
-import sys
-sys.path.insert(0, '.')
-from save_models import save_sklearn, save_lstm, save_distilbert, save_keras_tokenizer
-
-save_sklearn(nb_pipeline, 'naive_bayes_pipeline')
-save_sklearn(best_lr_model, 'logistic_regression_pipeline')
-save_keras_tokenizer(tokenizer)
-save_lstm(rnn_model)
-save_distilbert(model_bert, tokenizer_bert)
-```
-
-For TensorFlow / Transformers support, uncomment in `backend/requirements.txt`:
-
-```
-tensorflow==2.15.0
-transformers==4.36.2
-```
-
-### Model File Locations
-
-| Model | File(s) | Path |
-|---|---|---|
-| Naive Bayes | `naive_bayes_pipeline.pkl` | `backend/models/saved/` |
-| Logistic Regression | `logistic_regression_pipeline.pkl` | `backend/models/saved/` |
-| LSTM | `rnn_lstm.h5` + `tokenizer.pkl` | `backend/models/saved/` |
-| DistilBERT | entire directory | `backend/models/saved/distilbert/` |
 
 ---
 
@@ -183,185 +111,179 @@ transformers==4.36.2
 
 ```
 sentiment-dashboard/
+├── train_and_export.py          # Run once — trains all models, writes JSON
+│
 ├── backend/
-│   ├── main.py                  # FastAPI app + all API routes
-│   ├── schemas.py               # Pydantic request/response models
+│   ├── main.py                  # FastAPI app — serves static JSON files only
 │   ├── requirements.txt         # Python dependencies
 │   ├── models/
-│   │   ├── loader.py            # Loads all 4 models on startup
-│   │   └── saved/               # Place .pkl / .h5 / distilbert/ files here
-│   └── services/
-│       ├── preprocess.py        # Text cleaning pipeline (HTML → lemmatize)
-│       ├── predict.py           # Inference logic for all model types
-│       └── explain.py           # LIME explanation generation
+│   │   └── saved/               # Trained model files saved here after training
+│   └── data/
+│       └── exports/             # Generated JSON files (created by train_and_export.py)
+│           ├── metrics.json
+│           ├── confusion_matrices.json
+│           ├── roc_curves.json
+│           ├── pr_curves.json
+│           ├── training_history.json
+│           ├── error_samples.json
+│           ├── lime_examples.json
+│           ├── confidence_dist.json
+│           ├── feature_importance.json
+│           ├── dataset_stats.json
+│           └── model_agreement.json
 │
-├── frontend/
-│   └── src/
-│       ├── pages/
-│       │   ├── Home.jsx             # Hero, stat cards, pipeline diagram
-│       │   ├── DataExplorer.jsx     # Charts + paginated review table
-│       │   ├── LivePredictor.jsx    # Textarea → model → confidence gauge
-│       │   ├── ModelComparison.jsx  # Metrics, ROC, radar, confusion matrix
-│       │   └── ErrorAnalysis.jsx    # Filterable misclassification table
-│       ├── components/
-│       │   ├── Navbar.jsx
-│       │   ├── StatCard.jsx
-│       │   ├── ConfidenceGauge.jsx  # SVG arc gauge
-│       │   ├── LimeHighlighter.jsx  # Color-coded word importance
-│       │   ├── ModelSelector.jsx    # Multi-model toggle
-│       │   └── charts/
-│       │       ├── MetricsBar.jsx
-│       │       ├── ROCCurve.jsx
-│       │       ├── RadarChart.jsx
-│       │       └── ConfusionMatrix.jsx
-│       ├── hooks/
-│       │   └── usePrediction.js     # Custom hook for API calls + state
-│       └── services/
-│           └── api.js               # Axios client (VITE_API_URL)
-│
-├── save_models.py               # Helper to export trained models for the API
-└── sentiment_analysis.py        # Original training script
+└── frontend/
+    └── src/
+        ├── pages/
+        │   ├── Home.jsx             # Hero, stat cards, pipeline diagram
+        │   ├── DataExplorer.jsx     # Charts + paginated review table
+        │   ├── ModelComparison.jsx  # Metrics, ROC, PR, radar, confusion matrices
+        │   ├── ErrorAnalysis.jsx    # Filterable misclassification table
+        │   ├── LimeExplorer.jsx     # Pre-computed LIME word explanations
+        │   └── FeatureImportance.jsx # Top words by model weight
+        ├── components/
+        │   ├── Navbar.jsx
+        │   └── UI.jsx               # Shared: StatCard, Badge, ErrorBanner
+        ├── hooks/
+        │   └── useData.js           # Data fetching hook (loading / error / data)
+        ├── services/
+        │   └── api.js               # Axios client — all API call functions
+        └── constants.js             # Model colors, chart styles
 ```
 
 ---
 
 ## 📡 API Reference
 
-### Prediction
+All endpoints read from pre-generated JSON files. No ML inference at request time.
 
 | Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/predict` | Single model prediction + LIME explanation |
-| `POST` | `/predict/compare` | Run all 4 models on the same input |
+|--------|----------|-------------|
+| `GET` | `/` | Health check + list of available export files |
+| `GET` | `/metrics` | Accuracy, Precision, Recall, F1, AUC-ROC, inference time per model |
+| `GET` | `/confusion-matrices` | TP / TN / FP / FN counts per model |
+| `GET` | `/roc-curves` | FPR / TPR arrays (200 points per model) |
+| `GET` | `/pr-curves` | Precision / Recall arrays (200 points per model) |
+| `GET` | `/training-history` | Loss + accuracy per epoch (LSTM and DistilBERT only) |
+| `GET` | `/errors` | Misclassifications — filterable by `model`, `error_type`, `min_confidence` |
+| `GET` | `/confidence-distribution` | Correct vs wrong prediction counts by confidence bucket |
+| `GET` | `/feature-importance` | Top 30 positive/negative words per model |
+| `GET` | `/lime-examples` | Pre-computed LIME explanations — filterable by `model` |
+| `GET` | `/dataset/stats` | Length distributions, sentiment balance, sample reviews |
+| `GET` | `/model-agreement` | Pairwise agreement matrix + universally hard cases |
 
-**Example request:**
-
-```bash
-curl -X POST http://localhost:8000/predict \
-  -H "Content-Type: application/json" \
-  -d '{"text": "This movie was absolutely fantastic!", "model": "logistic_regression"}'
+**Filter example:**
 ```
-
-**Example response:**
-
-```json
-{
-  "model": "logistic_regression",
-  "sentiment": "positive",
-  "confidence": 0.9312,
-  "lime_words": [
-    { "word": "fantastic", "weight": 0.8421 },
-    { "word": "absolutely", "weight": 0.3109 }
-  ],
-  "inference_time_ms": 12.4
-}
+GET /errors?model=Naive+Bayes&error_type=False+Positive&min_confidence=0.85
 ```
-
-### Analytics & Data
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/metrics` | Pre-computed test set metrics for all 4 models |
-| `GET` | `/dataset/stats` | EDA data (lengths, word freqs, sample reviews) |
-| `GET` | `/errors` | Misclassifications — filterable by `model`, `true_label`, `pred_label` |
-| `GET` | `/training-history` | Loss/accuracy per epoch (`?model=rnn_lstm` or `distilbert`) |
-| `GET` | `/` | Health check |
 
 ---
 
 ## 🎨 Pages
 
 | Page | Route | What's Inside |
-|---|---|---|
-| **Home** | `/` | Hero, stat cards, pipeline diagram, tech stack grid |
-| **Data Explorer** | `/data` | Length histograms, sentiment donut, word frequency bars, paginated review table |
-| **Live Predictor** | `/predictor` | Textarea input, model selector, confidence gauge, LIME word highlighting |
-| **Model Comparison** | `/comparison` | Metrics table, grouped bars, ROC curves, radar chart, confusion matrices, training history |
-| **Error Analysis** | `/errors` | Filterable misclassification table, high-confidence failures, error-by-length chart, sarcasm examples |
+|------|-------|---------------|
+| **Home** | `/` | Hero, real best-model stats, pipeline diagram, tech stack |
+| **Dataset** | `/data` | Length histograms, sentiment donut, LR word importance, length vs accuracy, sample reviews |
+| **Models** | `/comparison` | Metrics table, bar/radar charts, ROC curves, PR curves, confusion matrices, training curves, inference speed, model agreement |
+| **Errors** | `/errors` | Confidence distribution, high-confidence failures, filterable misclassifications table |
+| **Explanations** | `/lime` | LIME word-level explanations with positive/negative weight bars |
+| **Features** | `/features` | Top words from LR coefficients and NB log-probabilities, diverging bar chart |
 
 ---
 
-## 📊 Model Performance
+## 📊 What Each JSON File Contains
 
-| Model | Accuracy | Precision | Recall | F1-Score | AUC-ROC |
-|---|---|---|---|---|---|
-| 🟣 **Naive Bayes** | 87.2% | 87.6% | 86.7% | 87.1% | 0.950 |
-| 🔵 **Logistic Regression** | 90.4% | 91.0% | 89.7% | 90.3% | 0.967 |
-| 🟢 **RNN (LSTM)** | 91.2% | 91.8% | 90.5% | 91.1% | 0.972 |
-| 🟡 **DistilBERT** ⭐ | **93.2%** | **93.5%** | **92.8%** | **93.1%** | **0.986** |
+| File | Generated From | Contains |
+|------|---------------|----------|
+| `metrics.json` | `sklearn.metrics` after each model | Accuracy, F1, AUC, inference ms |
+| `confusion_matrices.json` | `confusion_matrix()` | TP/TN/FP/FN for each model |
+| `roc_curves.json` | `roc_curve()` | 200 FPR/TPR points per model |
+| `pr_curves.json` | `precision_recall_curve()` | 200 precision/recall points |
+| `training_history.json` | Keras `fit()` history | Loss + accuracy per epoch (LSTM, BERT) |
+| `error_samples.json` | Comparing `y_pred` vs `y_test` | Top 60 highest-confidence errors per model |
+| `confidence_dist.json` | Histogram of `max(p, 1-p)` | Correct vs wrong counts per confidence bucket |
+| `feature_importance.json` | `clf.coef_[0]` and `feature_log_prob_` | Top 30 words per sentiment per model |
+| `lime_examples.json` | `LimeTextExplainer.explain_instance()` | Word weights for 12 diverse samples |
+| `dataset_stats.json` | Pandas + numpy on full IMDB df | Lengths, frequencies, sample reviews |
+| `model_agreement.json` | Pairwise `np.mean(p1 == p2)` | Agreement matrix + universally hard samples |
 
 ---
 
 ## 🛠️ Tech Stack
 
-**Frontend**
+### Frontend
 
 | Technology | Purpose |
-|---|---|
+|------------|---------|
 | React 18 + Vite | UI framework + fast dev server |
 | Tailwind CSS | Utility-first styling with custom warm palette |
 | Recharts | Line, bar, pie, radar chart components |
 | Framer Motion | Smooth page and element animations |
 | React Router v6 | Client-side routing |
 | Axios | HTTP client with base URL config |
-| react-hot-toast | Non-intrusive notification toasts |
-| lucide-react | Clean icon set |
+| Lucide React | Clean icon set |
 
-**Backend**
+### Backend & ML
 
 | Technology | Purpose |
-|---|---|
+|------------|---------|
 | FastAPI | Async Python API framework |
-| Pydantic v2 | Request/response schema validation |
+| Pydantic v2 | Response schema validation |
 | uvicorn | ASGI server |
 | scikit-learn | Naive Bayes + Logistic Regression pipelines |
-| TensorFlow/Keras | Bidirectional LSTM model |
-| HuggingFace Transformers | DistilBERT fine-tuning + inference |
+| TensorFlow/Keras | Bidirectional LSTM model (optional) |
+| HuggingFace Transformers | DistilBERT fine-tuning (optional) |
 | LIME | Local Interpretable Model-agnostic Explanations |
 | NLTK | Stopword removal + lemmatization |
+| pandas + numpy | Dataset loading and statistics |
 
 ---
 
 ## ⚙️ Environment Variables
 
-**Frontend** — create `frontend/.env`:
+Create `frontend/.env` to override the API URL:
 
-```env
+```
 VITE_API_URL=http://localhost:8000
 ```
 
-For production, point this to your deployed backend URL.
+---
+
+## 📦 IMDB Dataset
+
+The training script loads the dataset automatically in this order:
+
+1. Looks for `IMDB Dataset.csv` in the project root
+2. Falls back to downloading via HuggingFace `datasets` library (`pip install datasets`)
+3. If neither is available, exits with a clear error message
+
+The dataset is 50,000 reviews — 25,000 positive and 25,000 negative (perfectly balanced). 80% is used for training, 20% for testing.
 
 ---
 
 ## 🚢 Deployment
 
 ### Backend (e.g. Render)
-
-1. Set all Python environment variables in your host dashboard
-2. Install command: `pip install -r requirements.txt`
-3. Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
-4. For TF/BERT models, ensure your instance has enough RAM (≥ 4 GB recommended)
+- Install command: `pip install -r requirements.txt`
+- Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Upload the `backend/data/exports/` JSON files alongside the code (generated locally by `train_and_export.py`)
+- No GPU or large RAM required at runtime — backend only reads JSON
 
 ### Frontend (e.g. Vercel)
-
-1. Set `VITE_API_URL` to your deployed backend URL (e.g. `https://your-backend.onrender.com`)
-2. Build command: `npm run build`
-3. Output directory: `dist`
-4. Vercel auto-handles client-side routing rewrites
+- Set `VITE_API_URL` to your deployed backend URL
+- Build command: `npm run build`
+- Output directory: `dist`
 
 ---
 
-## 🐛 Known Issues / Common Gotchas
+## ⚠️ Common Issues
 
-- ✅ Demo mode runs without any model files — great for UI testing
-- ✅ LIME falls back to keyword heuristics for non-sklearn models (LSTM, DistilBERT)
-- ⚠️ TensorFlow and Transformers are commented out in `requirements.txt` by default — uncomment to enable LSTM + DistilBERT
-- ⚠️ DistilBERT requires ~1.5 GB RAM to load — demo mode is recommended for lightweight hosting
-- ⚠️ LIME explanations add ~200–500ms to inference time for sklearn models
-
----
-
-## 📄 License
-
-MIT — free to use, modify, and distribute.
+| Issue | Fix |
+|-------|-----|
+| Dashboard shows "No training data yet" | Run `python train_and_export.py` from the project root |
+| `numpy` build error on Python 3.12 | Requirements use `>=` — update pip first: `pip install --upgrade pip` |
+| LSTM / DistilBERT missing from dashboard | Install optional deps: `pip install tensorflow transformers` |
+| LIME page is empty | Install lime: `pip install lime` then re-run training |
+| Frontend can't reach backend | Check `VITE_API_URL` in `frontend/.env`, ensure backend runs on port 8000 |
+| `datasets` download fails | Place `IMDB Dataset.csv` in the project root instead |
