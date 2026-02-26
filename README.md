@@ -277,13 +277,3 @@ The dataset is 50,000 reviews — 25,000 positive and 25,000 negative (perfectly
 
 ---
 
-## ⚠️ Common Issues
-
-| Issue | Fix |
-|-------|-----|
-| Dashboard shows "No training data yet" | Run `python train_and_export.py` from the project root |
-| `numpy` build error on Python 3.12 | Requirements use `>=` — update pip first: `pip install --upgrade pip` |
-| LSTM / DistilBERT missing from dashboard | Install optional deps: `pip install tensorflow transformers` |
-| LIME page is empty | Install lime: `pip install lime` then re-run training |
-| Frontend can't reach backend | Check `VITE_API_URL` in `frontend/.env`, ensure backend runs on port 8000 |
-| `datasets` download fails | Place `IMDB Dataset.csv` in the project root instead |
